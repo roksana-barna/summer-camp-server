@@ -206,6 +206,10 @@ async function run() {
       const result = await enrolledCollection.insertOne(newItem)
       res.send(result);
     })
+    app.get('/enrolled',verifyJWT, async (req, res) => {
+      const result = await enrolledCollection.find().toArray();
+      res.send(result);
+    });
     // 
     app.get('/class', async (req, res) => {
       const result = await classCollection.find().toArray();
@@ -226,7 +230,8 @@ async function run() {
       const result = await feedbackCollection.find().toArray();
       res.send(result);
     })
-    // instructor find
+    // student data find
+    
     //
     
     await client.db("admin").command({ ping: 1 });
