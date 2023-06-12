@@ -54,6 +54,10 @@ async function run() {
     await client.connect();
     // Send a ping to confirm a successful connection
     const usersCollection = client.db("danceDb").collection("users");
+    const classCollection = client.db("classDb").collection("class");
+    const feedbackCollection = client.db('feedDb').collection('feedback')
+    const enrolledCollection=client.db('classDb').collection('enrolled')
+
 
     app.post('/jwt', (req, res) => {
       const user = req.body;
@@ -70,6 +74,14 @@ async function run() {
       }
       next();
     }
+
+    // instructor
+    app.get('/instructors', async (req, res) => {
+      const query = {role:'instructor'}
+      const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // users
     app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
       const result = await usersCollection.find().toArray();
@@ -157,6 +169,66 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
+    // approved api
+    app.patch('/class/approved/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          role: 'approved'
+        },
+      };
+      const result = await classCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    })
+    app.patch('/class/denied/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          role: 'denied'
+        },
+      };
+      const result = await classCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    })
+    // class api
+    app.post('/classes', verifyJWT, async (req, res) => {
+      const newItem = req.body;
+      const result = await classCollection.insertOne(newItem)
+      res.send(result);
+    })
+    // enrooled
+    app.post('/enrolled', verifyJWT, async (req, res) => {
+      const newItem = req.body;
+      const result = await enrolledCollection.insertOne(newItem)
+      res.send(result);
+    })
+    // 
+    app.get('/class', async (req, res) => {
+      const result = await classCollection.find().toArray();
+      res.send(result);
+    });
+    app.get('/classes', async (req, res) => {
+      const query = {role: 'approved'}
+      const result = await classCollection.find(query).toArray();
+      res.send(result);
+    })
+    // feedback
+    app.post('/feedback',  async (req, res) => {
+      const feed= req.body;
+      const result = await feedbackCollection.insertOne(feed)
+      res.send(result);
+    })
+    app.get('/feedback', async (req, res) => {
+      const result = await feedbackCollection.find().toArray();
+      res.send(result);
+    })
+    // instructor find
+    //
+    
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
