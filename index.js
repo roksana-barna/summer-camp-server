@@ -7,8 +7,14 @@ const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 
 
 const port = process.env.PORT || 5000;
+
 // middleware
-app.use(cors());
+const corsOptions ={
+  origin:'*', 
+  credentials:true,
+  optionSuccessStatus:200,
+}
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const verifyJWT = (req, res, next) => {
@@ -228,7 +234,7 @@ async function run() {
      const email=req.params.email;
      const query={ email :{ $eq:email}};
      console.log(email)
-      const result = await enrolledCollection.find(query).toArray()
+      const result = await enrolledCollection.find(query).limit(6).toArray()
       res.send(result);
     });
     // 
@@ -249,7 +255,8 @@ async function run() {
       res.send(result);
     })
     app.get('/feedback', async (req, res) => {
-      const result = await feedbackCollection.find().toArray();
+      const query={status:'denied'}
+      const result = await feedbackCollection.find(query).toArray();
       res.send(result);
     })
     // student data find
@@ -275,20 +282,15 @@ async function run() {
         clientSecret: paymentIntent.client_secret
       })
     })
-    // app.post('/payments', verifyJWT, async (req, res) => {
-    //   const payment = req.body;
-    //   const insertResult = await paymentCollection.insertOne(payment);
-    //   const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
-    //   const deleteResult = await Collection.deleteMany(query)
-    //   res.send({ insertResult, deleteResult });
-    // })
+    
    
-    app.post('payments',async(req,res)=>{
+    app.post('/payments',async(req,res)=>{
       const payment=req.body;
+      console.log({payment})
       const result=await paymentCollection.insertOne(payment);
       res.send(result);
     })
-      
+    
     
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
