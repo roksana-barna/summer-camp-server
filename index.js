@@ -49,12 +49,7 @@ const client = new MongoClient(uri, {
 });
 
 
-// MongoClient.connect(uri, function(err, client) {
-//   const collection = client.db("test").collection("devices");
-//   // perform actions on the collection object
-//   client.close();
-// });
-
+/
 
 async function run() {
   try {
@@ -66,8 +61,6 @@ async function run() {
     const feedbackCollection = client.db('feedDb').collection('feedback')
     const enrolledCollection=client.db('classDb').collection('enrolled')
     const paymentCollection = client.db("classDb").collection("payments");
-
-
 
     app.post('/jwt', (req, res) => {
       const user = req.body;
