@@ -159,7 +159,7 @@ async function run() {
       const result = { student: user?.role === 'student' }
       res.send(result);
     })
-
+// for get student id
  app.patch('/users/student/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id);
