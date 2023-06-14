@@ -276,7 +276,7 @@ async function run() {
       })
     })
     
-   
+  //  payment insert in database
     app.post('/payments',async(req,res)=>{
       const payment=req.body;
       console.log({payment})
