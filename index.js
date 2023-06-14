@@ -211,7 +211,7 @@ async function run() {
        const result = await classCollection.find(query).toArray()
        res.send(result);
      });
-    // enrooled
+    // enrooled students data
    
     app.post('/enrolled', async (req, res) => {
       const newItem = req.body;
