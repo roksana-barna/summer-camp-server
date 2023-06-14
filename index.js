@@ -59,6 +59,8 @@ async function run() {
     const classCollection = client.db("classDb").collection("class");
     const feedbackCollection = client.db('feedDb').collection('feedback')
     const enrolledCollection=client.db('classDb').collection('enrolled')
+    const paymentCollection = client.db("classDb").collection("payments");
+
 
 
     app.post('/jwt', (req, res) => {
@@ -202,6 +204,14 @@ async function run() {
       const result = await classCollection.insertOne(newItem)
       res.send(result);
     })
+    // for pay
+    app.get('/classes/:email', async (req, res) => {
+      const email=req.params.email;
+      const query={ email :{ $eq:email}};
+      console.log(email)
+       const result = await classCollection.find(query).toArray()
+       res.send(result);
+     });
     // enrooled
    
     app.post('/enrolled', async (req, res) => {
@@ -265,7 +275,19 @@ async function run() {
         clientSecret: paymentIntent.client_secret
       })
     })
+    // app.post('/payments', verifyJWT, async (req, res) => {
+    //   const payment = req.body;
+    //   const insertResult = await paymentCollection.insertOne(payment);
+    //   const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
+    //   const deleteResult = await Collection.deleteMany(query)
+    //   res.send({ insertResult, deleteResult });
+    // })
    
+    app.post('payments',async(req,res)=>{
+      const payment=req.body;
+      const result=await paymentCollection.insertOne(payment);
+      res.send(result);
+    })
       
     
     await client.db("admin").command({ ping: 1 });
